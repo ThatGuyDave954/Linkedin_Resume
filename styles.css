@@ -1,0 +1,79 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #222; /* Darker background */
+    color: #8fbc8f; /* Greenish text */
+    text-align: center; /* Center content */
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+main {
+    padding: 20px;
+    max-width: 800px;
+    margin: 20px auto; /* Centered and with space */
+    background-color: #333; /* Darker background */
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    border-radius: 8px;
+}
+
+.profile-photo {
+    display: block;
+    max-width: 400px; 
+    height: auto;    
+    margin: 0 auto;
+    border-radius: 8px;
+}
+
+.about-me, .ctf-labs-link, .linkedin-link, .feedback-link, .return-home, .return-links {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.ctf-labs-link a, .linkedin-link a, .feedback-link a, .return-home a, .return-links a {
+    text-decoration: none;
+    color: #8fbc8f;
+    font-size: 1.2em;
+}
+
+.ctf-labs-link a:hover, .linkedin-link a:hover, .feedback-link a:hover, .return-home a:hover, .return-links a:hover {
+    text-decoration: underline;
+}
+
+h2 {
+    color: #8fbc8f; /* Greenish heading text */
+}
+
+#ctf-labs ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+}
+
+#ctf-labs li {
+    margin: 10px 0;
+}
+
+#ctf-labs a {
+    text-decoration: none;
+    color: #8fbc8f;
+    font-size: 1.2em;
+}
+
+#ctf-labs a:hover {
+    text-decoration: underline;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+    margin-top: 20px;
+}
