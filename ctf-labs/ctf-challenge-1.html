@@ -27,8 +27,10 @@
         <section>
             <h2>Challenge Overview</h2>
             <p>In this write-up I will walk you through the steps I had taken to obtain root access for the Jangow01 CTF on Vulnhub.</p>
-            <a href="https://www.vulnhub.com/entry/jangow-101,754/">Jangow01 Link</a>
         </section>
+        <div class="Link">
+            <a href="https://www.vulnhub.com/entry/jangow-101,754/">Jangow01 Link</a>
+        </div>
 
         <section>
             <h2>Reconnaissance</h2>
@@ -99,7 +101,9 @@
             <p>After locating that the URL parameter allows me to input command line injections and visibly see the results, I was able to upload a shell onto the server &
                  then escalate my privileges to root. Once I have root privileges I have full access to the system. To mitigate this issue I would advise sanitizing the malicious characters in the URL parameter.</p>
             <p>This falls under the A01 Broken Access Control category because I was able to modify the URL & escalate my privileges</p>
+            <div class="Link">
             <a href="https://owasp.org/Top10/A01_2021-Broken_Access_Control/">Owasp A01 Broken Access Control</a>
+            </div>
             <img src="../Jangow01/root.png" alt="Root">
         </section>
 
