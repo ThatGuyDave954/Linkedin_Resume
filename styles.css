@@ -31,18 +31,18 @@ main {
     border-radius: 8px;
 }
 
-.about-me, .ctf-labs-link, .linkedin-link, .feedback-link, .return-home, .return-links {
+.about-me, .ctf-labs-link, .linkedin-link, .feedback-link, .return-home, .return-links .Link {
     text-align: center;
     margin-top: 20px;
 }
 
-.ctf-labs-link a, .linkedin-link a, .feedback-link a, .return-home a, .return-links a {
+.ctf-labs-link a, .linkedin-link a, .feedback-link a, .return-home a, .return-links a .Link {
     text-decoration: none;
     color: #8fbc8f;
     font-size: 1.2em;
 }
 
-.ctf-labs-link a:hover, .linkedin-link a:hover, .feedback-link a:hover, .return-home a:hover, .return-links a:hover {
+.ctf-labs-link a:hover, .linkedin-link a:hover, .feedback-link a:hover, .return-home a:hover, .return-links a:hover Link:hover {
     text-decoration: underline;
 }
 
