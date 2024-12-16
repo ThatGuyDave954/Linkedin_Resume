@@ -42,7 +42,7 @@ main {
     font-size: 1.2em;
 }
 
-.ctf-labs-link a:hover, .linkedin-link a:hover, .feedback-link a:hover, .return-home a:hover, .return-links a:hover, Link a:hover {
+.ctf-labs-link a:hover, .linkedin-link a:hover, .feedback-link a:hover, .return-home a:hover, .return-links a:hover, .Link a:hover {
     text-decoration: underline;
 }
 
