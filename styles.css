@@ -36,13 +36,13 @@ main {
     margin-top: 20px;
 }
 
-.ctf-labs-link a, .linkedin-link a, .feedback-link a, .return-home a, .return-links a .Link {
+.ctf-labs-link a, .linkedin-link a, .feedback-link a, .return-home a, .return-links a .Link a {
     text-decoration: none;
     color: #8fbc8f;
     font-size: 1.2em;
 }
 
-.ctf-labs-link a:hover, .linkedin-link a:hover, .feedback-link a:hover, .return-home a:hover, .return-links a:hover Link:hover {
+.ctf-labs-link a:hover, .linkedin-link a:hover, .feedback-link a:hover, .return-home a:hover, .return-links a:hover Link a:hover {
     text-decoration: underline;
 }
 
