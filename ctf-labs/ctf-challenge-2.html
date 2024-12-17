@@ -40,7 +40,7 @@
             <p>Attempting to access <code>http://192.168.0.60:80</code> and <code>https://192.168.0.60:443</code> both came back with little to no information</p>
             <img src="../PlanetsEarth/port 443.png" alt="Port 443">
             <p>Running a secondary advanced <code>nmap</code> scan with service detection revealed the following:</p>
-            <pre><code>nmap -A -p- 192.168.0.60</code></pre>
+            <pre><code>nmap -A -sS -p- 192.168.0.60</code></pre>
             <img src="../PlanetsEarth/second nmap.png" alt="Second nmap">
             <p>The scan provided the following DNS entries:</p>
                 <code>earth.local</code>
