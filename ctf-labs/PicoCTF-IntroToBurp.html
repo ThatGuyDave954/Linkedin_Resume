@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PicoCTF Intro To Burp</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <header>
+        <h1>PicoCTF Intro To Burp</h1>
+    </header>
+    
+    <main>
+        <section>
+            <h2>Challenge Overview: We will be tackling the PicoCTF Intro To Burp challenge</h2>
+            <p></p>
+            <a href="https://play.picoctf.org/practice/challenge/419?category=1&page=1">PicoCTF Intro To Burp link</a>
+        </section>
+
+        <section>
+            <h2>Description:</h2>
+            <img src="../Images/IntroToBurp/IntroToBurp desc.png" alt="Description">
+            <p>Lets go ahead and navigate to the webpage for this challenge</p>
+            <p>I go ahead an input information into the fields and intercept the request through BurpSuite</p>
+            <img src="../Images/IntroToBurp/registration.png" alt="registration">
+            <p>After filling out that information it takes us to a second page for a One Time Password, which we do not have</p>
+            <img src="../Images/IntroToBurp/OTP.png" alt="OTP">
+            <p>Lets go ahead and update the OTP field to see if it will bypass the OTP request</p>
+            <img src="../Images/IntroToBurp/IntroToBurp flag.png" alt="flag">
+            <p>We got the flag after manipulating the OTP field</p>
+
+
+        </section>
+            <h2>Conclusion:</h2>
+            <p>In this challenge I was able to manuipulate the OTP password field and bypass what security feature they had in place. To mitigate this issue I would implement automated systems to detect and respond to
+                 potential threats in real time, such as flagging suspicious login attempts or triggering additional verification steps for high-risk activities. </p>
+            <a href="https://owasp.org/Top10/A05_2021-Security_Misconfiguration/">OWASP A05 Security Misconfiguration</a>
+        </section>
+
+
+        <div class="return-links">
+            <a href="../ctf-labs.html">Return to CTFs/Labs</a> | <a href="../index.html">Return to Home Page</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 David Cochran</p>
+    </footer>
+</body>
+</html>
