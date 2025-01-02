@@ -43,8 +43,6 @@
             <p>I then scan the network for vulnerabilities that can be exploited by utilizing Nikto</p>
             <p><code>nikto -h 192.168.0.243</code></p>
             <img src="../Images/DrippingBlues1/nikto.png" alt="nikto">
-        </section>
-        <section>
             <p>I attempt to connect to the FTP by using default credentials, which I do connect and I am able to locate a respectmydrip.zip file</p>
             <img src="../Images/DrippingBlues1/ftp.png" alt="ftp">
             <p>On my victim machine I go ahead and download the file onto the adversary machine by using <code>get repectmydrip.zip</code></p>
@@ -55,8 +53,6 @@
             <img src="../Images/DrippingBlues1/zip2john.png" alt="zip2john">
             <p>After using John, it provides me with the password of "072528035" and I unzip the file which returns two files: respectmydrip.txt & screcret.zip (needs password) </p>
             <p>Inside the repectmydrip.txt file it says "just focus on "drip" - which could be a possible username or password</p>
-        </section>
-        <section>
             <p>Moving forward I go ahead and navigate to /etc/dripispowerful.html</p>
             <img src="../Images/DrippingBlues1/dripispowerful.png" alt="dripispowerful">
             <p>The page that is shown appears to be file inclusion so I will attempt to fuzz it to see if I am able to locate what user is able to view the file</p>
@@ -101,15 +97,23 @@
             <p>I take the CVE and input it into github which I was able to locate an easily usable privilege escalation python file</p>
             <img src="../Images/DrippingBlues1/exploit.png" alt="exploit">
             <p>I download the exploit onto my adversary machine then send it to my victim machine</p>
+        </section>
+        <section>
             <h2>Delivery:</h2>
             <img src="../Images/DrippingBlues1/send exploit.png" alt="send exploit">
+        </section>
+        <section>
             <h2>Installation:</h2>
             <img src="../Images/DrippingBlues1/get exploit.png" alt="get exploit">
             <p>With the file now on my victim machine, I determine what python is being run on the server by <code>which python3</code></p>
             <p>I am then able to run <code>python3 CVE-2021-3560.py</code> which then provides me with root access</p>
+        </section>
+        <section>
             <h2>Exploitation:</h2>
             <img src="../Images/DrippingBlues1/start exploit.png" alt="start exploit">
             <img src="../Images/DrippingBlues1/end exploit.png" alt="end exploit">
+        </section>
+        <section>
             <h2>C2 Command and Control & Actions on Objectives:</h2>
             <p>Now with root access I am able to cat the root flag</p>
             <img src="../Images/DrippingBlues1/root flag.png" alt="root flag">
