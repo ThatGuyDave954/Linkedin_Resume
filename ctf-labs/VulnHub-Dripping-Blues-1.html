@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VulnHub - Dripping Blues 1</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <header>
+        <h1>VulnHub - Dripping Blues</h1>
+    </header>
+    
+    <main>
+        <section>
+            <h2>Challenge Overview:</h2>
+            <p>This write-up details the steps taken to solve Dripping Blues 1 CTF on Vulnhub</p>
+            <a href="https://www.vulnhub.com/entry/dripping-blues-1,744/">Dripping blues 1 Link</a>
+        </section>
+
+        <section>
+            <h2>Reconnaissance:</h2>
+            <p>I began by using <code>netdiscover</code> to locate the victim machine:</p>
+            <pre><code>netdiscover -r 192.168.0.0/24</code></pre>
+            <img src="../Images/DrippingBlues1/netdiscover.png" alt="Netdiscover">
+            <p>The scan identified the target machine at <code>192.168.0.243</code>. When navigating to the page I am displayed with the message below</p>
+            <img src="../Images/DrippingBlues1/192 168 0 243.png" alt="192 168 0 243">
+            <p>I do keep the "travisscott & thugger" part in mind as those might be usernames later down the road</p>
+            <p>I continue with my reconnaissance by scanning with nmap</p>
+            <pre><code>nmap -A -p- 192.168.0.243</code></pre>
+            <img src="../Images/DrippingBlues1/nmap.png" alt="nmap">
+            <p>The results revealed the following open ports:</p>
+            <code>21/tcp (FTP)</code>
+            <br>
+            <code>22/tcp (SSH)</code>
+            <br>
+            <code>80/tcp (HTTP)</code>
+            <p>The scan also came back with a <code>robots.txt</code> & <code>dripisreal.txt</code></p>
+            <p>I go ahead and navigate to both pages</p>
+            <img src="../Images/DrippingBlues1/robots.png" alt="robots">
+            <img src="../Images/DrippingBlues1/dripisreal.png" alt="drip is real">
+            <p>After creating a temp.txt file with the count of words from the drip is real, I go ahead and md5sum it. This was a dead end, I believe to distract us from the main objective</p>
+            <p>I then scan the network for vulnerabilities that can be exploited by utilizing Nikto</p>
+            <p><code>nikto -h 192.168.0.243</code></p>
+            <img src="../Images/DrippingBlues1/nikto.png" alt="nikto">
+        </section>
+        <section>
+            <p>I attempt to connect to the FTP by using default credentials, which I do connect and I am able to locate a respectmydrip.zip file</p>
+            <img src="../Images/DrippingBlues1/ftp.png" alt="ftp">
+            <p>On my victim machine I go ahead and download the file onto the adversary machine by using <code>get repectmydrip.zip</code></p>
+            <img src="../Images/DrippingBlues1/get respectmydrip.png" alt="get respectmydrip">
+            <p>Now that the file is on my adversary machine, I attempt to unzip the file which prompts me with "respectmydrip.zip" is password-protected</p>
+            <img src="../Images/DrippingBlues1/password protected.png" alt="password protected">
+            <p>I go ahead and make the file ready for John the ripper by using <code>zip2john respectmydrip.zip > hashes</code> then utilize John by running <code>john --wordlist=/usr/share/wordlists/rockyou.txt hashes </code></p>
+            <img src="../Images/DrippingBlues1/zip2john.png" alt="zip2john">
+            <p>After using John, it provides me with the password of "072528035" and I unzip the file which returns two files: respectmydrip.txt & screcret.zip (needs password) </p>
+            <p>Inside the repectmydrip.txt file it says "just focus on "drip" - which could be possible username or password</p>
+        </section>
+        <section>
+            <p>Moving forward I go ahead and navigate to /etc/dripispowerful.html</p>
+            <img src="../Images/DrippingBlues1/dripispowerful.png" alt="dripispowerful">
+            <p>The page that is shown appears to be file inclusion so I will attempt to fuzz it to see if I am able to locate what user is able to view the file</p>
+            <code>wfuzz -u 'http://192.168.0.243/?FUZZ=/etc/dripispowerful.html' -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt --hw 21</code>
+            <p>This calls out the specific URL & word list for the fuzzing application to look at with a total count of 21 characters</p>
+            <img src="../Images/DrippingBlues1/wfuzz.png" alt="wfuzz">
+            <p>The fuzzing application calls out that the information we were looking for was "drip" which was previously called out in respectmydrip.txt</p>
+            <p>I go ahead and navigate to the URL of http://192.168.0.243/?drip=/etc/dripispowerful.html</p>
+            <img src="../Images/DrippingBlues1/drip dripispowerful.png" alt="drip dripispowerful">
+            <p>Once I am on the page I go ahead and inspect the source code to see what information could be hiding</p>
+            <img src="../Images/DrippingBlues1/source dripispowerful.png" alt="source dripispowerful">
+            <p>The source code identified a password being "imdrippinbiatch"</p>
+            <p>With my username list being travisscott, thugger, and drip I attempt to connect to the ssh server by going to my terminal on my adversary machine</p>
+            <code>ssh travisscot@192.168.0.243</code>
+            <br>
+            <code>ssh thugger@192.168.0.243</code>
+            <br>
+            <code>ssh drip@192.168.0.243</code>
+            <p>I was able to connect to the server as thugger so I do not need to attempt using "drip" as the username as I think it was specific to the file inclusion</p>
+            <img src="../Images/DrippingBlues1/thugger.png" alt="thugger">
+        </section>
+        <section>
+            <h2>Weaponization:</h2>
+            <p>Now I start to figure out how to tailor my attack to be a privilege escalation</p>
+            <code>cat /etc/*release</code>
+            <br>
+            <img src="../Images/DrippingBlues1/release.png" alt="release">
+            <p>I find out that the server is running on <b>Ubuntu 20.04</b> which I will keep in mind for the future</p>
+            <p>I attempt to look up if there are any exploits that I can find on searchsploit but the results that can back were empty</p>
+            <p>I then attempt to look to see if I can find anything that stands out in the SUID binaries and the results did not yeild anything that I could capatilize on</p>
+            <p>I then manually go through each directory which were all empty</p>
+            <p>I then check to see what process are running by using <code>ps aux</code></p>
+            <p>I then review the output and locate two processes that stood out</p>
+            <p>VSFTPD has had vulnerabilities in the past (for example, CVE-2011-2523), though it is considered a secure FTP server overall.
+                However, any misconfiguration or use of older versions might expose security risks. You should verify if you're using the latest 
+                stable release.</p>
+            <p>and</p>
+            <p>System Services systemd, dbus, polkitd: Vulnerabilities in these services could allow privilege escalation or other attacks. Make sure you are using the latest versions
+                 of these services and that they are properly configured.</p>
+            <p>After some research on the polkitd or policy kit I was able to locate CVE-2021-3560 which further investigation identified that <b>Ubuntu 20.04</b> is vulnerable</p>
+            <img src="../Images/DrippingBlues1/polkit vuln.png" alt="polkit vuln">
+            <p>I take the CVE and input it into github which I was able to locate an easily usable privilege escalation python file</p>
+            <img src="../Images/DrippingBlues1/exploit.png" alt="exploit">
+            <p>I download the exploit onto my adversary machine then send it to my victim machine</p>
+            <h2>Delivery:</h2>
+            <img src="../Images/DrippingBlues1/send exploit.png" alt="send exploit">
+            <h2>Installation:</h2>
+            <img src="../Images/DrippingBlues1/get exploit.png" alt="get exploit">
+            <p>With the file now on my victim machine, I determine what python is being ran on the server by <code>which python3</code></p>
+            <p>I am then able to run <code>python3 CVE-2021-3560.py</code> which then provides me with root access</p>
+            <h2>Exploitation:</h2>
+            <img src="../Images/DrippingBlues1/start exploit.png" alt="start exploit">
+            <img src="../Images/DrippingBlues1/end exploit.png" alt="end exploit">
+            <h2>C2 Command and Control & Actions on Objectives:</h2>
+            <p>Now with root access I am able to cat the root flag</p>
+            <img src="../Images/DrippingBlues1/root flag.png" alt="root flag">
+        </section>
+            <h2>Conclusion:</h2>
+            <p>In this example I was able to gain full access to the SSH server by an outdated policy kit. I was able to download an exploit to the server by locating credentials in my reconnaissance phase due 
+                to them being easily locatable. Once in the server I was able to see what processes were being ran and found the outdated policy kit and capitalized on it. To mitigate this issue I would update
+                the version of Ubuntu that is being ran on the server and change the default credentials on the FTP port and santize what information is in the source code as that is what provided me with the SSH credentials.
+            </p>
+            <a href=https://owasp.org/Top10/A05_2021-Security_Misconfiguration>OWASP A05 Security Misconfiguration</a>
+        </section>
+
+
+        <div class="return-links">
+            <a href="../ctf-labs.html">Return to CTFs/Labs</a> | <a href="../index.html">Return to Home Page</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 David Cochran</p>
+    </footer>
+</body>
+</html>
