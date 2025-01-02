@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PicoCTF WebDecode</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <header>
+        <h1>PicoCTF WebDecode</h1>
+    </header>
+    
+    <main>
+        <section>
+            <h2>Challenge Overview: We will be tackling the PicoCTF WebDecode challenge</h2>
+            <p></p>
+            <a href="https://play.picoctf.org/practice/challenge/427?category=1&page=1">PicoCTF WebDecode Link</a>
+        </section>
+
+        <section>
+            <h2>Challenge Description</h2>
+            <img src="../Images/WebDecode/webdecode desc.png" alt="Description">
+            <p>After doing some navigating in the source code I was able to identify some code that appears to be base64 encoded</p>
+            <img src="../Images/WebDecode/encoded.png" alt="Encoded">
+            <p>I take the code and throw it into a decoder which outputs the flag</p>
+            <img src="../Images/WebDecode/decoded.png" alt="Decoded">
+        </section>
+            <h2>Conclusion: Although this was a simple challenge, if a project is rushed and sensitive data is simply encoded an adversary would be able to quickly identify it & gather that information. To mitigate this issue
+                I would sanitize the sensitive information and discard it if it is not necessary.
+            </h2>
+            <p></p>
+            <a href="https://owasp.org/Top10/A02_2021-Cryptographic_Failures/">OWASP A02 Cryptographic Failures</a>
+        </section>
+
+
+        <div class="return-links">
+            <a href="../ctf-labs.html">Return to CTFs/Labs</a> | <a href="../index.html">Return to Home Page</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 David Cochran</p>
+    </footer>
+</body>
+</html>
