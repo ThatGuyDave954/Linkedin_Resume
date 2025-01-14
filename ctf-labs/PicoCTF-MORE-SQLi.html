@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PicoCTF - MORE SQLi</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <header>
+        <h1>PicoCTF - MORE SQLi</h1>
+    </header>
+    
+    <main>
+        <section>
+            <h2>Challenge Overview</h2>
+            <p>The challenge description on PicoCTF's website asks participants to locate the flag within a website utilizing an SQLite database. The task requires identifying vulnerabilities and exploiting SQL injections.</p>
+            <a href="https://play.picoctf.org/practice/challenge/358?category=1&difficulty=2&page=1">Challenge Link: MORE SQLi</a>
+            <img src="../Images/MORE SQLi/desc.png" alt="Challenge Description">
+        </section>
+
+        <section>
+            <h2>Obtaining the Flag</h2>
+            <p>Upon accessing the challenge page, I was presented with a login form. I attempted a default login using:</p>
+            <code>Username: admin</code>
+            <code>Password: password</code>
+            <img src="../Images/MORE SQLi/login page.png" alt="Login Page">
+            <p>However, the credentials were incorrect, and the page displayed how the SQL query processed the login request.</p>
+            <img src="../Images/MORE SQLi/wrong password.png" alt="Incorrect Password Response">
+
+            <p>After some research, I discovered SQL injection techniques that could bypass the login form. Using the following credentials, I successfully logged in:</p>
+            <pre><code>
+Username: admin
+Password: 'or 1=1--
+            </code></pre>
+            <img src="../Images/MORE SQLi/tables.png" alt="tables">
+            <p>Once logged in, I needed to identify the number of columns in the database table. Using a SQL injection cheat sheet and Burp Suite's Repeater, I determined there were three columns.</p>
+            <img src="../Images/MORE SQLi/cheet sheet.png" alt="SQL Injection Cheat Sheet">
+            <p>To probe the database, I crafted the following SQL queries to retrieve information from the SQLite <code>sqlite_master</code> table:</p>
+            <pre><code>algiers' UNION SELECT SQL, 1, 1 FROM sqlite_master--</code></pre>
+            <p>or</p>
+            <pre><code>algiers' UNION SELECT SQL, null, null FROM sqlite_master--</code></pre>
+            <p>or</p>
+            <pre><code>algiers' UNION SELECT SQL, null, 1 FROM sqlite_master--</code></pre>
+            <p>All three queries successfully satisfied the number of columns.</p>
+            <img src="../Images/MORE SQLi/tables.png" alt="Database Tables Discovered">
+
+            <p>The <code>sqlite_master</code> table is the main metadata table for SQLite databases, storing schema information. Using this, I identified the table containing the flag and crafted the following query:</p>
+            <pre><code>algiers' UNION SELECT flag, null, null FROM more_table--</code></pre>
+            <p>This query successfully returned the flag, which I submitted to PicoCTF to complete the challenge.</p>
+            <img src="../Images/MORE SQLi/flag.png" alt="Flag Retrieved">
+        </section>
+
+        <section>
+            <h2>Conclusion</h2>
+            <p>This challenge demonstrated the risks associated with SQL injection vulnerabilities. By exploiting these vulnerabilities, I was able to bypass authentication, retrieve sensitive data, and locate the flag.</p>
+            <p>This vulnerability falls under the <a href="https://owasp.org/Top10/A03_2021-Injection/">OWASP Top 10: A03 - Injection</a> category, specifically SQL injection.</p>
+            <h3>Mitigation Strategies</h3>
+             <p>Use parameterized queries with prepared statements to avoid concatenating untrusted input.</p>
+             <p>Implement properly constructed stored procedures to handle database interactions securely.</p>
+             <p>Apply strict input validation using an allow-list approach to prevent malicious input.</p>
+        </section>
+
+        <div class="return-links">
+            <a href="../ctf-labs.html">Return to CTFs/Labs</a> | <a href="../index.html">Return to Home Page</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 David Cochran</p>
+    </footer>
+</body>
+</html>
