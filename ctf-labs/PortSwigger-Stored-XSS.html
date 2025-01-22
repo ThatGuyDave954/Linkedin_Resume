@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortSwigger Stored XSS</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <header>
+        <h1>PortSwigger Stored XSS</h1>
+    </header>
+    
+    <main>
+        <section>
+            <h2>Lab Overview</h2>
+            <p>This lab focused on exploiting a stored Cross-Site Scripting (XSS) vulnerability within an anchor tag's `href` attribute, where double quotes are HTML-encoded</p>
+            <img src="../Images/PS Stored XSS/desc.png" alt="Lab Description">
+            <a href="https://portswigger.net/web-security/cross-site-scripting/contexts/lab-href-attribute-double-quotes-html-encoded">
+                Lab: Stored XSS into anchor href attribute with double quotes HTML-encoded
+            </a>
+        </section>
+
+        <section>
+            <h2>Lab Work</h2>
+            <p>To begin, I loaded the lab and identified input fields that could be vulnerable to Cross-Site Scripting attacks</p>
+            <img src="../Images/PS Stored XSS/home page.png" alt="Lab Home Page">
+            <p>Upon inspecting a blog post, I found a comment section with two potentially vulnerable input fields</p>
+            <img src="../Images/PS Stored XSS/comment section.png" alt="Comment Section">
+            <p>My first attempt involved injecting a simple alert payload into the comment field:</p>
+            <pre><code>&lt;script&gt;alert(1)&lt;/script&gt;</code></pre>
+            <img src="../Images/PS Stored XSS/first payload.png" alt="First Payload Attempt">
+            <p>This payload did not yield the expected results, so I proceeded to test the URI field, targeting it with the following payload:</p>
+            <pre><code>javascript:alert(1)</code></pre>
+            <p>A Uniform Resource Identifier (URI) is a string used to identify resources such as webpages, files, or email addresses. Exploiting the URI field is a common technique for triggering XSS attacks</p>
+            <p>Using Burp Suite, I intercepted the original request and modified it in the Repeater tool to inject the payload before resending the request</p>
+            <p>The second payload successfully exploited the vulnerable URI field, resulting in the alert box appearing</p>
+            <img src="../Images/PS Stored XSS/second payload.png" alt="Second Payload Attempt">
+            <img src="../Images/PS Stored XSS/lab solved.png" alt="Lab Solved">
+        </section>
+
+        <section>
+            <h2>Conclusion</h2>
+            <p>This lab demonstrated the importance of testing all input fields for potential vulnerabilities. I tested two fields: the comment section and the URI field. While the comment field did not result in a successful XSS attack, the URI field was vulnerable, and I was able to execute a stored XSS payload.</p>
+            
+            <p>This vulnerability falls under the <a href="https://owasp.org/Top10/A03_2021-Injection/">OWASP Top 10 A03: Injection</a> category, specifically within the Cross-Site Scripting (XSS) subset. XSS vulnerabilities account for approximately 18% of reported security issues and remain a significant risk to web applications.</p>
+        </section>
+
+        <section>
+            <h2>Mitigation Strategies</h2>
+            <p>Ensuring robust input validation, output encoding, and HTML sanitization is essential for mitigating XSS vulnerabilities. Specifically:</p>
+            <p>All variables should undergo strict validation and sanitization before use.</p>
+            <p>Output encoding ensures that user input is safely rendered on the page.</p>
+            <p>Using tools like Content Security Policies (CSPs) can provide additional layers of protection.</p>
+            
+        </section>
+
+        <div class="return-links">
+            <a href="../ctf-labs.html">Return to CTFs/Labs</a> | <a href="../index.html">Return to Home Page</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 David Cochran</p>
+    </footer>
+</body>
+</html>
