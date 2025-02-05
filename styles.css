@@ -104,3 +104,11 @@ img {
     border: 2px solid #8fbc8f;
     border-radius: 8px;
 }
+
+video {
+    max-width: 100%;
+    height: auto;
+    margin: 20px 0;
+    border: 2px solid #8fbc8f;
+    border-radius: 8px;
+}
