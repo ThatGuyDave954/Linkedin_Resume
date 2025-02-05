@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VulnHub Empire Breakout</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <header>
+        <h1>VulnHub Empire Breakout</h1>
+    </header>
+    
+    <main>
+        <section>
+            <h2>Challenge Overview:</h2>
+            <p>This write-up details the steps taken to complete the Empire Breakout CTF on VulnHub and gain root access.</p>
+            <a href="https://www.vulnhub.com/entry/empire-breakout,751/">Empire Breakout Challenge</a>
+        </section>
+
+        <section>
+            <h2>Reconnaissance:</h2>
+            <p>I started by using netdiscover to identify the target machine.</p>
+            <code>netdiscover -r 192.168.0.0/24</code>
+            <img src="../Images/Empire breakout/netdiscover.png" alt="netdiscover">
+            <p>The target was located at 192.168.0.231, and navigating to this address displayed the Apache2 Debian default page.</p>
+            <img src="../Images/Empire breakout/default.png" alt="default debian">
+
+            <p>Next, I performed an Nmap scan to identify open ports and services.</p>
+            <code>nmap -A -p- 192.168.0.231</code>
+            <p>The following ports were open:</p>
+                <p>80 - HTTP</p>
+                <p>139 - NetBIOS</p>
+                <p>445 - SMB</p>
+                <p>10,000 - Webmin</p>
+                <p>20,000 - Usermin</p>
+            </ul>
+            <video width="800" autoplay muted loop>
+                <source src="../Images/Empire breakout/nmap.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>            
+
+            <p>Both ports 10,000 and 20,000 required credentials to access.</p>
+            <img src="../Images/Empire breakout/Webmin.png" alt="Webmin">
+            <img src="../Images/Empire breakout/Usrmin.png" alt="Usermin">
+            <p>Port 20,000 appeared to be restricted to users, while port 10,000 seemed to be for administrators.</p>
+
+            <p>Since I had no credentials, I continued my reconnaissance using Nikto to scan for vulnerabilities.</p>
+            <code>nikto -h 192.168.0.231</code>
+            <p>The scan revealed two accessible directories:</p>
+            <p>/manual/ - Web server manual</p>
+            <p>/manual/images/ - Directory indexing enabled</p>   
+            <img src="../Images/Empire breakout/manual.png" alt="Manual">
+            <img src="../Images/Empire breakout/manual images.png" alt="Manual Images">
+
+            <p>After exploring both directories, I didn’t find any useful information. I then returned to the login pages to check if the developers had left any clues.</p>
+            <p>While inspecting the source code, I found a suspicious encoded string.</p>
+            <img src="../Images/Empire breakout/default souce code.png" alt="Default source code">
+            
+            <p>After decoding the string using various tools, I identified it as Brainfuck encryption, revealing what appeared to be a password.</p>
+            <img src="../Images/Empire breakout/Brainfuck.png" alt="Brainfuck">
+            <img src="../Images/Empire breakout/brainfuck p2.png" alt="Brainfuck 2">
+            
+            <p>The decoded message was: .2uqPEfj3D&lt;P'a-3</p>
+            <p>Assuming this was a password, I still needed a valid username. I used enum4linux to enumerate users on the system.</p>
+            <code>enum4linux 192.168.0.231</code>
+            <video width="800" autoplay muted loop>
+                <source src="../Images/Empire breakout/enum4linux video.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>            
+            <p>The scan revealed a username: "cyber".</p>
+            <p>Using these credentials, I successfully logged into Usermin on port 20,000.</p>
+            <img src="../Images/Empire breakout/port 20000.png" alt="Port 20,000 Usermin">
+        </section>
+
+        <section>
+            <h2>Weaponization:</h2>
+            <p>Now inside the system, I explored permissions and system details.</p>
+            <img src="../Images/Empire breakout/command shell.png" alt="Command shell">
+            
+            <p>Checking the OS version revealed it was running Debian 11.</p>
+            <code>cat /etc/*release</code>
+
+            <p>I searched for privilege escalation exploits using SearchSploit.</p>
+            <code>searchsploit Debian 11</code>
+
+            <p>An exploit for Debian 9 was available, so I attempted to execute it by uploading the file to the server’s file manager.</p>
+            <img src="../Images/Empire breakout/file manager.png" alt="File Manager">
+            <p>However, the exploit was unsuccessful.</p>
+
+            <p>Next, I uploaded a reverse shell, but after making it interactive, I encountered instability, so I continued working from the web shell.</p>
+
+            <p>At this point, I was unsure of the next step, so I revisited earlier findings and researched privilege escalation techniques using tar.</p>
+            <p>The article I found mentioned the /home/backup directory, but after searching, I instead located a /var/backups/ directory.</p>
+            <p>Inside, I discovered an interesting file: .old_pass.bak.</p>
+            <img src="../Images/Empire breakout/old pass.png" alt="Old pass">
+        </section>
+
+        <section>
+            <h2>Deliver, Exploitation, & Installation:</h2>
+            <p>Since I couldn't read the file directly, I used tar to extract its contents.</p>
+            <code>./tar -cvf old /var/backups/.old_pass.bak</code>
+
+            <p>After extraction, I could now read the file, which contained what appeared to be the root password.</p>
+            <p>Using the credentials:</p>
+            <p>Username: root </p> 
+            <p>Password: Ts&4&YurgtRX(=~h</p>
+            <p>I successfully logged into Webmin with root privileges.</p>
+            <img src="../Images/Empire breakout/root pass.png" alt="Root Pass">
+        </section>
+
+        <section>
+            <h2>C2 Command & Control and Actions on Objectives:</h2>
+            <p>With root access, I was able to execute arbitrary commands, capture system flags, and establish a reverse shell back to my adversary machine.</p>
+            <img src="../Images/Empire breakout/root flag.png" alt="Root flag">
+            <img src="../Images/Empire breakout/root access.png" alt="Root access">
+        </section>
+
+        <section>
+            <h2>Conclusion</h2>
+            <p>This challenge demonstrated how improperly protected credentials and weak encryption practices can lead to a complete system compromise. The key vulnerability was the exposure of sensitive information in the source code and failure to properly secure backup files. By leveraging enumeration techniques and privilege escalation strategies, I was able to gain full system control.</p>
+
+            <h2>Mitigation Strategies</h2>
+            <p>Remove sensitive data from source code and comments.</p>
+            <p>Use stronger encryption to protect credentials./p>
+            <p>Regularly audit and secure backup files.</p>
+            <p>Restrict user privileges and follow least privilege principles.</p>
+
+            <p>This vulnerability aligns with A02:2021 - Cryptographic Failures, emphasizing the importance of proper encryption, key management, and secure password storage.</p>
+            <a href="https://owasp.org/Top10/A02_2021-Cryptographic_Failures/">OWASP A02: Cryptographic Failures</a>
+        </section>
+
+        <div class="return-links">
+            <a href="../ctf-labs.html">Return to CTFs/Labs</a> | <a href="../index.html">Return to Home Page</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 David Cochran</p>
+    </footer>
+</body>
+</html>
